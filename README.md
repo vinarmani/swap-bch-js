@@ -1,6 +1,6 @@
 # swap-bch-js
 
-swap-bch-js is a JavaScript Library for building transactions for Signal, Watch, and Pay (SWaP) Protocol.  The library is a fork of bitcoinfilesjs and also supports the Bitcoin Files Protocol (BFP). Methods for uploading and downloading files are provided [per the BFP specification](https://github.com/simpleledger/slp-specification/blob/master/bitcoinfiles.md).  For convenience, BITBOX network functionality has been built into the library.
+swap-bch-js is a JavaScript Library for building transactions for Signal, Watch, and Pay (SWaP) Protocol.  The library is a fork of [bitcoinfilesjs](https://github.com/simpleledger/BitcoinFilesJS) and also supports the Bitcoin Files Protocol (BFP). Methods for uploading and downloading files are provided [per the BFP specification](https://github.com/simpleledger/slp-specification/blob/master/bitcoinfiles.md).  For convenience, BITBOX network functionality has been built into the library.
 
 Other tools using the Bitcoin Files Protocol include:
 * [Electron Cash SLP Edition](http://electroncash.org/#slp)
