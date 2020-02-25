@@ -1,25 +1,19 @@
-# bitcoinfilesjs
+# swap-bch-js
 
-bitcoinfilesjs is a JavaScript Library for building transactions for Bitcoin Files Protocol (BFP).  Methods for uploading and downloading files are provided [per the BFP specification](https://github.com/simpleledger/slp-specification/blob/master/bitcoinfiles.md).  For convenience, BITBOX network functionality has been built into the library.
+swap-bch-js is a JavaScript Library for building transactions for Signal, Watch, and Pay (SWaP) Protocol.  The library is a fork of bitcoinfilesjs and also supports the Bitcoin Files Protocol (BFP). Methods for uploading and downloading files are provided [per the BFP specification](https://github.com/simpleledger/slp-specification/blob/master/bitcoinfiles.md).  For convenience, BITBOX network functionality has been built into the library.
 
 Other tools using the Bitcoin Files Protocol include:
 * [Electron Cash SLP Edition](http://electroncash.org/#slp)
 * [BitcoinFiles.com](http://bitcoinfiles.com)
 
-[![NPM](https://nodei.co/npm/bitcoinfiles.png)](https://nodei.co/npm/bitcoinfiles/)
-
 # Installation
 
 #### For node.js
-`npm install bitcoinfiles`
-
-#### For browser
-```<script src='https://unpkg.com/bitcoinfiles'></script>```
- 
+`npm install swap-bch-js`
 
 # Example File Download
 ```javascript
-const Bfp = require('bitcoinfiles').bfp;
+const Bfp = require('swap-bch-js').bfp;
 const bfp = new Bfp();
 
 // 1 - download file using URI
@@ -44,9 +38,9 @@ let fileBuffer = result.fileBuf;
 Below is a simple example.  For a more complete React.js [file upload example](https://github.com/simpleledger/SimpleToken.cash/blob/master/src/UploadDialog.js) visit [SimpleToken.cash website](https://simpletoken.cash)
 
 ```javascript
-const Bfp = require('bitcoinfiles').bfp;
-const Network = require('bitcoinfiles').network;
-const BITBOX = require('bitcoinfiles').bitbox;
+const Bfp = require('swap-bch-js').bfp;
+const Network = require('swap-bch-js').network;
+const BITBOX = require('swap-bch-js').bitbox;
 
 const bfp = new Bfp();
 const network = new Network();
@@ -103,7 +97,7 @@ let fileId;
 
 ```javascript
 
-const bfp = require('bitcoinfiles');
+const bfp = require('swap-bch-js');
 
 let metadata;
 (async function(){
