@@ -1,0 +1,49 @@
+{
+  "name": "swap-bch-js",
+  "version": "0.1.0",
+  "description": "Signal, Watch and Pay (SWaP) Protocol on the Bitcoin Cash blockchain",
+  "main": "index.js",
+  "files": [
+    "lib/",
+    "dist/"
+  ],
+  "scripts": {
+    "test": "mocha",
+    "build": "browserify index.js --standalone swap-bch-js > dist/swap-bch-js.js && uglifyjs dist/swap-bch-js.js > dist/swap-bch-js.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinarmani/swap-bch-js.git"
+  },
+  "keywords": [
+    "BCH",
+    "bfp",
+    "bitcoin",
+    "swap",
+    "cash",
+    "slp",
+    "simple",
+    "ledger",
+    "node",
+    "browser"
+  ],
+  "author": "Vin Armani",
+  "license": "MIT",
+  "unpkg": "dist/swap-bch-js.min.js",
+  "bugs": {
+    "url": "https://github.com/vinarmani/swap-bch-js/issues"
+  },
+  "homepage": "https://github.com/vinarmani/swap-bch-js#readme",
+  "dependencies": {
+    "grpc-bchrpc-node": "^0.10.0",
+    "grpc-bchrpc-web": "^0.5.0",
+    "i": "^0.3.6",
+    "npm": "^6.13.7"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2",
+    "mocha": "^5.2.0",
+    "uglify-es": "^3.3.9",
+    "bitbox-sdk": "^8.3.0"
+  }
+}
