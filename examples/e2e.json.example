@@ -1,0 +1,11 @@
+{
+    "collectWif": WIF_FOR_ADDRESS_TO_COLLECT_FUNDS,
+    "collectAddress": BITCOINCASH_ADDRESS_TO_COLLECT_FUNDS,
+
+    "wifArray": [
+            WIF_OF_OFFERING_PARTY,
+            WIF_OF_ACCEPTING_PARTY,
+            WIF_OF_THIRD_CROWDFUNDER,
+            WIF_OF_ESCROW_ORACLE
+        ]
+}
