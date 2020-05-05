@@ -74,7 +74,7 @@ const network = swp.network;
         
         let msgType = 1 // exchange
 
-        // 3 - estimate upload cost for funding the transaction
+        // 2 - estimate upload cost for funding the transaction
         const fileSize = 0 // No file included in this tx
         let config = {
             tokenId: 'c4b0d62156b3fa5c8f3436079b5394f7edc1bef5dc1cd2f9d0c4d46f82cca479',
@@ -88,7 +88,7 @@ const network = swp.network;
         let uploadCost = Swp.calculateFileUploadCost(fileSize, config);
         console.log('upload cost: ', uploadCost);
 
-        // 4 - Make sure address above is funded with the amount equal to the uploadCost
+        // 3 - Make sure address above is funded with the amount equal to the uploadCost
 
         let fundingUtxos = await network.getUtxos(fundingAddress, false);
 
@@ -104,7 +104,7 @@ const network = swp.network;
 
         // wait for network to resolve...
 
-        // 5 - upload the file
+        // 4 - upload the file
         let fileId = await swp.uploadSignal(msgType, fundingUtxos, fundingAddress, fundingWif, config);
         console.log('Offer Signal Id: ', fileId);
     
@@ -137,7 +137,7 @@ const network = swp.network;
         let fundingAddress = bitbox.ECPair.toCashAddress(fundingEcpair)
         let msgType = 2 // escrow
 
-        // 3 - estimate upload cost for funding the transaction
+        // 2 - estimate upload cost for funding the transaction
         const fileSize = 0 // No file included in this tx
         let config = {
             oracleBfp: 'ee10994d61ae1318d6298975283509e44eeace497d30765cf1c7bc48a7410d2f',
@@ -154,7 +154,7 @@ const network = swp.network;
         let uploadCost = Swp.calculateFileUploadCost(fileSize, config);
         console.log('upload cost: ', uploadCost);
 
-        // 4 - Make sure address above is funded with the amount equal to the uploadCost
+        // 3 - Make sure address above is funded with the amount equal to the uploadCost
         let fundingUtxos = await network.getUtxos(fundingAddress, false);
 
         let availableSats = fundingUtxos.reduce(function (accumulator, currentValue) {
@@ -169,7 +169,7 @@ const network = swp.network;
 
         // wait for network to resolve...
 
-        // 5 - upload the file
+        // 4 - upload the file
         let fileId = await swp.uploadSignal(msgType, fundingUtxos, fundingAddress, fundingWif, config);
         console.log('Offer Signal Id: ', fileId);
     } catch (e) {
@@ -220,7 +220,7 @@ function outputArrayToBuffer (outputObject) {
 
         let outputsBuf = utils.outputsArrayToBuffer(outputArray)
 
-        // 3 - estimate upload cost for funding the transaction
+        // 2 - estimate upload cost for funding the transaction
         const fileSize = 0 // No file included in this tx
         let config = {
             msgClass: 1,
@@ -231,7 +231,7 @@ function outputArrayToBuffer (outputObject) {
         let uploadCost = Swp.calculateFileUploadCost(fileSize, config);
         console.log('upload cost: ', uploadCost);
 
-        // 4 - Make sure address above is funded with the amount equal to the uploadCost
+        // 3 - Make sure address above is funded with the amount equal to the uploadCost
 
         let fundingUtxos = await network.getUtxos(fundingAddress, false);
 
@@ -247,7 +247,7 @@ function outputArrayToBuffer (outputObject) {
 
         // wait for network to resolve...
 
-        // 5 - upload the file
+        // 4 - upload the file
         let fileId = await swp.uploadSignal(msgType, fundingUtxos, fundingAddress, fundingWif, config);
         console.log('fileId: ', fileId);
     } catch (e) {
