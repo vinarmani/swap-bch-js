@@ -1,23 +1,44 @@
 const SLPSDK = require('slp-sdk')
 const bitbox = new SLPSDK({ restURL: 'https://rest.bitcoin.com/v2/' })
+const Bitcoin = require('bitcoincashjs-lib');
+
+const fs = require('fs');
+
+// Check if e2e.json exists and, if it doesn't, create it and populate it with new private keys in WIF.
+
+try {
+    if(fs.existsSync('./e2e.json')) {
+        console.log("e2e.json file exists.")
+    } else {
+        console.log('e2e.json file does not exist. Creating new file')
+        let ecPairArray = []
+        // Create 5 new random WIFs
+        for (let i = 0; i < 5; i++) {
+            let ecPair = Bitcoin.ECPair.makeRandom()
+            ecPairArray.push(ecPair)
+        }
+        let jsonObj = {
+            collectWif: bitbox.ECPair.toWIF(ecPairArray[0]),
+            collectAddress: bitbox.ECPair.toCashAddress(ecPairArray[0]),
+        
+            wifArray: [
+                bitbox.ECPair.toWIF(ecPairArray[1]),
+                bitbox.ECPair.toWIF(ecPairArray[2]),
+                bitbox.ECPair.toWIF(ecPairArray[3]),
+                bitbox.ECPair.toWIF(ecPairArray[4])
+            ]
+        }
+        // write file
+        fs.writeFileSync('./e2e.json', JSON.stringify(jsonObj));
+    }
+} catch (err) {
+    console.error(err);
+    process.exit()
+}
+
 const e2eConfig = require('./e2e.json');
 
 // This collects funds from addresses used in tests and then redistributes them as necessary
-
-/**
- * Edit e2e.json (with your own) so 
- * 
- *  let collectWif = 'KzyECu4WsxPkV74ge8c1AddQp9Z2TgKfyDJS1SWs68mwPvuLqZZS'
- *  let collectAddress = 'bitcoincash:qzp3t8w8nmwy0eew2ddfulwz6t6t8ln73s5nhlu8pt' // must be address for collectWif
- *
- *  let wifArray = [
- *      'L1tYLRZwubd23R1fP3u29nNhR7cQMV6obuboWtRYAMtNoeYhA1v6', // offer
- *      'L2vmQ1chDJ3HcfrVjJuvGfgLCEPp6TFtTK6Q3MJa8AeD1x8S5fxz', // accept
- *      'KycDPL5YLPXQHoSw8SL6mGHWbFeLA276vdywG6iSuuyDAKHC5GKt', // crowdfunder 3
- *      'L3ZvsbDF3Rj48NqxWxyL8oufL4iRxiLxZHrSNgdQAiHYf8XzuXNe', // oracle
- *  ]
- * 
- */
 
 module.exports = async function() {
     try {
@@ -79,11 +100,6 @@ module.exports = async function() {
 
         utxos = await bitbox.Address.utxo(collectAddress)
 
-        if (utxos.length == 0) {
-            console.log('No funds in collection address to redistribute')
-            process.exit()
-        }
-
         transactionBuilder = new bitbox.TransactionBuilder('mainnet');
 
         originalAmounts = []
@@ -95,12 +111,12 @@ module.exports = async function() {
                 totalInput += utxo.satoshis
         }
 
-        console.log(totalInput)
+        console.log('Total funds available to distribute:', totalInput)
 
-        byteCount = bitbox.BitcoinCash.getByteCount({ P2PKH: utxos.utxos.length }, { P2PKH: 17 })
+        byteCount = bitbox.BitcoinCash.getByteCount({ P2PKH: utxos.utxos.length + 1 }, { P2PKH: 17 })
 
         if(totalInput - (29300 + byteCount) < 546) {
-            console.log('You do not have enough total balance to do redistribution. You need at least ' + (29300 + byteCount + 546) +' in address ' + collectAddress)
+            console.log('You do not have enough total balance to do redistribution. You need at least ' + (29300 + byteCount + 546) +' satoshis in address ' + collectAddress)
             process.exit()
         }
 
