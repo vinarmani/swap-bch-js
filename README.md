@@ -27,21 +27,21 @@ let metadata;
 (async function(){
     try {
         // Exchange
-        exchangeMetadata = await swp.bitdb.getSignalMetadata(1, "3bebd6590b0870e13a65fbb6a59e891ec06cd2f1c162f2b3c034d8b1e1ae88b9");
+        let exchangeMetadata = await swp.bitdb.getSignalMetadata(1, "3bebd6590b0870e13a65fbb6a59e891ec06cd2f1c162f2b3c034d8b1e1ae88b9");
         console.log('exchange metadata: ', exchangeMetadata);
 
-        exchangeByTokenMetadata = await swp.bitdb.getSignalMetadata(1, null, "c4b0d62156b3fa5c8f3436079b5394f7edc1bef5dc1cd2f9d0c4d46f82cca479");
+        let exchangeByTokenMetadata = await swp.bitdb.getSignalMetadata(1, null, "c4b0d62156b3fa5c8f3436079b5394f7edc1bef5dc1cd2f9d0c4d46f82cca479");
         console.log('exchange by token metadata: ', exchangeByTokenMetadata);
 
         // Escrow
-        escrowMetadata = await swp.bitdb.getSignalMetadata(2, "d7cbeaab6d02769464f9c71a6efd8cd2682d728d7e5de3ac278372b1b81c9d83");
+        let escrowMetadata = await swp.bitdb.getSignalMetadata(2, "d7cbeaab6d02769464f9c71a6efd8cd2682d728d7e5de3ac278372b1b81c9d83");
         console.log('escrow metadata: ', escrowMetadata);
 
-        escrowByOracleMetadata = await swp.bitdb.getSignalMetadata(2, null, "974b3bf766b36434a21fe6f8782d8056f932d33ae401e92cf31a88204a21ea3e");
+        let escrowByOracleMetadata = await swp.bitdb.getSignalMetadata(2, null, "974b3bf766b36434a21fe6f8782d8056f932d33ae401e92cf31a88204a21ea3e");
         console.log('escrow by oracle metadata: ', escrowByOracleMetadata);
 
         // Crowdfund
-        crowdfundMetadata = await swp.bitdb.getSignalMetadata(3, "565c84990aacfbd006d4ed2ee14bfb0f3bb27a84a6c9adcabccb6fb8e17e64c5");
+        let crowdfundMetadata = await swp.bitdb.getSignalMetadata(3, "565c84990aacfbd006d4ed2ee14bfb0f3bb27a84a6c9adcabccb6fb8e17e64c5");
         console.log('crowdfund metadata: ', crowdfundMetadata);
         console.log('outputs to crowdfund', crowdfundMetadata.outputs)
 
