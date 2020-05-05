@@ -11,7 +11,7 @@ To install the necessary dependencies required to run the files, simply execute 
 `git clone https://github.com/vinarmani/swap-bch-js.git`
 
 2. Enter the newly created directory and run<br>
-`cd swap-bch-js`
+`cd swap-bch-js`<br>
 `npm install`
 
 3. Navigate to the examples directory<br>
