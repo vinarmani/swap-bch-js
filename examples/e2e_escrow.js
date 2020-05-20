@@ -782,7 +782,20 @@ function joinBuffers(buffers, delimiter = ' ') {
         // wait for network to resolve...
 
         // upload the file
-        let oracleResultFileId = await bfp.uploadFile(oracleFundingUtxo, oracleAddress, oracleWif, oracleResultFileBuffer, config.fileName, config.fileExt);
+        let oracleResultFileId = await bfp.uploadFile(oracleFundingUtxo,
+            oracleAddress,
+            oracleWif,
+            oracleResultFileBuffer,
+            config.fileName,
+            config.fileExt,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            3000);
         console.log('Oracle result Id: ', oracleResultFileId);
         console.log('Original oracle Id: ', oracleFileId)
 
