@@ -77,7 +77,7 @@ module.exports = async function() {
             console.log('Building and broadcasting collection tx...')
         
             let byteCount = bitbox.BitcoinCash.getByteCount({ P2PKH: inputIndexWif.length }, { P2PKH: 1 })
-            let collectAmount = totalInput - byteCount
+            let collectAmount = totalInput - byteCount - 20 // add padding for miner fee?
 
             transactionBuilder.addOutput(collectAddress, collectAmount)
 
@@ -115,8 +115,8 @@ module.exports = async function() {
 
         byteCount = bitbox.BitcoinCash.getByteCount({ P2PKH: utxos.utxos.length + 1 }, { P2PKH: 17 })
 
-        if(totalInput - (29300 + byteCount) < 546) {
-            console.log('You do not have enough total balance to do redistribution. You need at least ' + (29300 + byteCount + 546) +' satoshis in address ' + collectAddress)
+        if(totalInput - (29700 + byteCount) < 546) {
+            console.log('You do not have enough total balance to do redistribution. You need at least ' + (29700 + byteCount + 546) +' satoshis in address ' + collectAddress)
             process.exit()
         }
 
@@ -133,9 +133,9 @@ module.exports = async function() {
         // Oracle gets another for 1500
         transactionBuilder.addOutput(addressArray[3], 1500)
         // Oracle address gets an output of 3800
-        transactionBuilder.addOutput(addressArray[3], 3800)
+        transactionBuilder.addOutput(addressArray[3], 4200)
         // Change
-        transactionBuilder.addOutput(collectAddress, totalInput - (29300 + byteCount))
+        transactionBuilder.addOutput(collectAddress, totalInput - (29700 + byteCount))
 
         for (let i = 0; i < originalAmounts.length; i++) {
             transactionBuilder.sign(i, bitbox.ECPair.fromWIF(collectWif), null, transactionBuilder.hashTypes.SIGHASH_ALL, originalAmounts[i])

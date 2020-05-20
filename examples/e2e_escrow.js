@@ -6,6 +6,7 @@ const swp = new Swp(bitbox);
 const Bfp = swap.bfp;
 const bfp = new Bfp(bitbox);
 const network = swp.network;
+const utils = swap.utils;
 const eccrypto = require('eccrypto-js');
 const BigNumber = require('bignumber.js');
 const Bitcoin = require('bitcoincashjs-lib');
@@ -137,9 +138,50 @@ function joinBuffers(buffers, delimiter = ' ') {
         console.log('UTXOs found. Creating Oracle Signal...')
 
     // 2. Oracle broadcasts signal
-
-        const oracleJson = '{"league":"nba","date":"20200222","status":"UNPLAYED","awayTeam":{"id":"SAC","name":"Sacramento Kings","logo":"https://global.nba.com/media/img/teams/00/logos/SAC_logo.svg"},"homeTeam":{"id":"LAC","name":"Los Angeles Clippers","logo":"https://global.nba.com/media/img/teams/00/logos/LAC_logo.svg"},"contracts":{"jeton-lib":{"e001":{"terms":[{"parties":["NBA-20200222-SAC-LAC_SAC-WIN","NBA-20200222-SAC-LAC_LAC-WIN"],"publicKey":"02c3e42dd2a3806f1bc9a9f32c3a97b872ed03ce8a779242b8bf2dba636ce655b0"}]}}}}'
-        // const oracleJson = '{"results":{"finalScore":{"awayTeam":112,"homeTeam":103}},"contracts":{"jeton-lib":{"e001":{"terms":[{"parties":["NBA-20200222-SAC-LAC_SAC-WIN","NBA-20200222-SAC-LAC_LAC-WIN"],"publicKey":"02c3e42dd2a3806f1bc9a9f32c3a97b872ed03ce8a779242b8bf2dba636ce655b0","signature":"304402202d435db55d497053e9b9fc7620985c99a8f7ff62d164446731473fddc1661baa02205f986222198947c0897aadc70982203a1ee6021a86aa9b0da57ca93e1a43fc8e"}]}}}}'
+        const oracleData = {
+            "type":"event",
+            "data":{
+                "league":"nba",
+                "date":"20200222",
+                "status":"UNPLAYED",
+                "awayTeam":{
+                    "id":"SAC",
+                    "name":"Sacramento Kings",
+                    "logo":"https://global.nba.com/media/img/teams/00/logos/SAC_logo.svg"
+                },
+                "homeTeam":{
+                    "id":"LAC",
+                    "name":"Los Angeles Clippers",
+                    "logo":"https://global.nba.com/media/img/teams/00/logos/LAC_logo.svg"
+                }
+            },
+            "contracts":{
+                "jeton":{
+                    "escrow":{
+                        "parties":[
+                            {
+                                "name":"SAC Wins",
+                                "message":"NBA-20200222-SAC-LAC_SAC-WIN",
+                                "weight":1
+                            },
+                            {
+                                "name":"LAC Wins",
+                                "message":"NBA-20200222-SAC-LAC_LAC-WIN",
+                                "weight":1
+                            }
+                        ],
+                        "terms":[
+                            {
+                                "name":"refereePubKey",
+                                "type":"bytes",
+                                "value":"02c3e42dd2a3806f1bc9a9f32c3a97b872ed03ce8a779242b8bf2dba636ce655b0"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        const oracleJson = JSON.stringify(oracleData)
 
         // get a file and file metadata somehow 
         const oracleFileBuffer = new Buffer.from(oracleJson);
@@ -162,7 +204,6 @@ function joinBuffers(buffers, delimiter = ' ') {
         };
         let uploadCost = Bfp.calculateFileUploadCost(oracleFileSize, config);
         console.log('oracle signal upload cost: ', uploadCost);
-        // process.exit()
 
         // create a funding transaction
 
@@ -173,6 +214,7 @@ function joinBuffers(buffers, delimiter = ' ') {
             return b.satoshis - a.satoshis;
           }))
         let oracleFundingUtxo = oracleFundingUtxos[0];
+        console.log('oracleFundingUtxos', oracleFundingUtxos)
         
         console.log('got oracle funding Utxo.')
 
@@ -182,7 +224,20 @@ function joinBuffers(buffers, delimiter = ' ') {
         // wait for network to resolve...
 
         // upload the file
-        let oracleFileId = await bfp.uploadFile(oracleFundingUtxo, oracleAddress, oracleWif, oracleFileBuffer, config.fileName, config.fileExt);
+        let oracleFileId = await bfp.uploadFile(oracleFundingUtxo,
+            oracleAddress,
+            oracleWif,
+            oracleFileBuffer,
+            config.fileName,
+            config.fileExt,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            3000);
         console.log('Oracle signal Id: ', oracleFileId);
         //process.exit()
 
@@ -190,7 +245,7 @@ function joinBuffers(buffers, delimiter = ' ') {
         await sleep(5000)
 
     // 3. Offering party looks for oracle, constructs offer and broadcasts
-        // let oracleBfp = 'bitcoinfile:974b3bf766b36434a21fe6f8782d8056f932d33ae401e92cf31a88204a21ea3e'
+        // let oracleBfp = 'bitcoinfile:b3f4023cabcf8a5437bc84e736e6a24c50a7c1bb12089a5a17d4e9fd04340812'
         let oracleBfp = oracleFileId
 
         metadata = await bfp.bitdb.getFileMetadata(oracleBfp);
@@ -216,10 +271,18 @@ function joinBuffers(buffers, delimiter = ' ') {
             console.error(e)
         }
 
+        // Construct the oracle terms buffer to use in the Offer Signal
+        let compilerId = 'jeton'
+        let compilerVersion = 'escrow'
+        let oracleSignalObject = JSON.parse(fileBuffer.toString('utf-8'))
+        let oracleTermsArray = oracleSignalObject.contracts[compilerId][compilerVersion].terms
+        let termsBuffer = utils.termsArrayToBuffer(oracleTermsArray)
+
         // Make sure address above is funded with the amount equal to the uploadCost
         let fundingUtxos = await network.getUtxos(offerAddr, false);
         
         console.log('got funding Utxos for offer')
+        console.log(fundingUtxos)
 
         if(fundingUtxos.length < 3)
           throw new Error ('must have at least 3 UTXOs in '+offerAddr+', will use smallest to make wager')
@@ -242,14 +305,16 @@ function joinBuffers(buffers, delimiter = ' ') {
         // estimate upload cost for funding the transaction
         offerFileSize = 0 // No file included in this tx
         config = {
+            msgClass: 1,
+            msgType: msgType,
             oracleBfp: oracleBfp,
-            contractTermsIndex: 0,
+            compilerId: compilerId,
+            compilerVersion: compilerVersion,
             contractPartyIndex: 1,
-            compilerId: 'jeton-lib',
-            compilerVersion: 'e001',
             pubKey: bitbox.ECPair.toPublicKey(offerEcpair).toString('hex'),
             exactUtxoTxId: wagerOfferUtxo.txid,
             exactUtxoIndex: wagerOfferUtxo.vout,
+            terms: termsBuffer.toString('hex'),
             appendedScriptPubKey: '76a91410c1db6f3076e020974ef540199e7ae4b76fbafa88ac',
             appendedSats: 1000
         }
@@ -259,8 +324,6 @@ function joinBuffers(buffers, delimiter = ' ') {
         if(uploadCost > offerAvailableSats)
             throw new Error('Insufficient funds to send offer signal. Needed: '+uploadCost+'. You have: '+offerAvailableSats)
     
-        // process.exit()
-    
         // wait for network to resolve...
     
         // upload the offer
@@ -268,15 +331,15 @@ function joinBuffers(buffers, delimiter = ' ') {
         console.log('Offer Signal ID: ', offerSignalId);
 
     // 4. Accepting party looks for offer (we filter for one just broadcast)
-        // let offerSignalId = 'swap:d7cbeaab6d02769464f9c71a6efd8cd2682d728d7e5de3ac278372b1b81c9d83' // as example
+        // let offerSignalId = 'swap:62d3c03be906f3874a1d720b3c5e401fb6abe2bff660e52770c366a2c3d001fd' // as example
 
-        console.log('Waiting 2 seconds before searching for offer signal...')
-        await sleep(2000)
+        console.log('Waiting 5 seconds before searching for offer signal...')
+        await sleep(5000)
         // First get metadata
         let offerMetadata;
         try {
             offerMetadata = await swp.bitdb.getSignalMetadata(2, offerSignalId);
-            // console.log('Offer signal found. Metadata: ', offerMetadata);
+            console.log('Offer signal found. Metadata: ', offerMetadata);
         } catch (e) {
             throw new Error('Offer signal at '+offerSignalId+' not found')
         }
@@ -287,8 +350,8 @@ function joinBuffers(buffers, delimiter = ' ') {
         //     'bitcoinfile:974b3bf766b36434a21fe6f8782d8056f932d33ae401e92cf31a88204a21ea3e',
         //     contractTermsIndex: 0,
         //     contractPartyIndex: 1,
-        //     compilerId: 'jeton-lib',
-        //     compilerVersion: 'e001',
+        //     compilerId: 'jeton',
+        //     compilerVersion: 'escrow',
         //     pubKey:
         //     '0299edb7a63380305c32b6fd54e09f7c2cbcf85b7182a691b065d8e5aff16ef61f',
         //     exactUtxoTxId:
@@ -353,16 +416,17 @@ function joinBuffers(buffers, delimiter = ' ') {
 
         // Use Signal and Oracle data to build accept transaction
         // Create the output script
-        let oracleJetonData = oracleObj.contracts['jeton-lib']['e001'].terms[offerMetadata.contractTermsIndex]
+        let oracleJetonData = oracleObj.contracts[compilerId][compilerVersion]
+        let oraclePubKey = oracleJetonData.terms.find( ({ name }) => name === 'refereePubKey' )
         var outputScriptData = {
-            refereePubKey: jeton.PublicKey.fromString(oracleJetonData.publicKey),
+            refereePubKey: jeton.PublicKey.fromString(oraclePubKey.value),
             parties: [
                 {
-                    message: oracleJetonData.parties[0], 
+                    message: oracleJetonData.parties[0].message, 
                     pubKey: offerMetadata.contractPartyIndex == 0 ? new jeton.PublicKey(offerMetadata.pubKey) : new jeton.PublicKey(acceptPubKey)
                 },
                 {
-                    message: oracleJetonData.parties[1], 
+                    message: oracleJetonData.parties[1].message, 
                     pubKey: offerMetadata.contractPartyIndex == 1 ? new jeton.PublicKey(offerMetadata.pubKey) : new jeton.PublicKey(acceptPubKey)
                 }
             ]
@@ -498,19 +562,32 @@ function joinBuffers(buffers, delimiter = ' ') {
         if(acceptAvailableSats < uploadCost)
             throw new Error('Insufficient funds in '+acceptAddr+' to send escrow payment. Needed: '+uploadCost+'. You have: '+acceptAvailableSats)
 
-        let acceptPaymentFileId = await swp.uploadPayment(acceptUtxos, acceptAddr, acceptWif, encryptedEc, config.signalSha256Hex, swapTxDetails.vout[1].scriptPubKey.addresses[0], config.p2shScriptPubKey);
+        let acceptPaymentFileId = await swp.uploadPayment(acceptUtxos,
+            acceptAddr,
+            acceptWif,
+            encryptedEc,
+            config.signalSha256Hex,
+            swapTxDetails.vout[1].scriptPubKey.addresses[0],
+            config.p2shScriptPubKey,
+            false,
+            null,
+            null,
+            null,
+            null,
+            3000); // Increase time between chunks to allow indexer to catch up
         console.log('acceptPaymentFileId: ', acceptPaymentFileId);
 
         // process.exit()
 
         // 5. Offering party looks for payment and downloads it once found
-        console.log('Waiting 2 seconds before searching for accepted payment...')
-        await sleep(2000)
+        console.log('Waiting 5 seconds before searching for accepted payment...')
+        await sleep(5000)
         // First get metadata
         try {
             acceptPaymentFileId = acceptPaymentFileId
         } catch (e) {
-            acceptPaymentFileId = 'swap:67e82514787e656381a2584c7fe07b9bab3282844f25a792c2a63c88140cb878' // Placeholder for testing
+            console.error(e)
+            // acceptPaymentFileId = 'swap:777bd57a7e7992012d824e728a39767eed59b7c93bafc1ba4d3f3ce0140301a0' // Placeholder for testing
         }
         let paymentMetadata = await swp.bitdb.getPaymentMetadata(2, acceptPaymentFileId);
         console.log('Exchange payment metadata:', paymentMetadata);
@@ -576,15 +653,16 @@ function joinBuffers(buffers, delimiter = ' ') {
 
         // Use Signal and Oracle data to build accept transaction
         // Create the output script
-        oracleJetonData = oracleObj.contracts[offerMetadata.compilerId][offerMetadata.compilerVersion].terms[offerMetadata.contractTermsIndex]
+        oracleJetonData = oracleObj.contracts[offerMetadata.compilerId][offerMetadata.compilerVersion]
+        oraclePubKey = oracleJetonData.terms.find( ({ name }) => name === 'refereePubKey' )
 
         console.log('oracleJetonData: ', oracleJetonData)
         // Validate that the refereePubKey, and messages + offering party pubKeyHash are accurate for oracle and signal
-        if(parsedSubscript.refereePubKey != oracleJetonData.publicKey)
+        if(parsedSubscript.refereePubKey != oraclePubKey.value)
             throw new Error('Referee public key does not match oracle data')
         
         for(let i = 0; i < oracleJetonData.parties.length; i++) {
-            if(oracleJetonData.parties[i] != parsedSubscript.parties[i].message)
+            if(oracleJetonData.parties[i].message != parsedSubscript.parties[i].message)
                 throw new Error('Party messages do not match oracle data') 
         }
 
@@ -634,13 +712,30 @@ function joinBuffers(buffers, delimiter = ' ') {
 
         let sendRawTransaction = await bitbox.RawTransactions.sendRawTransaction(csTxHex);
         console.log('Completed contract broadcast', sendRawTransaction);
-        // let sendRawTransaction = 'c9ce7e06360fc0df1427d8075e87c9e315ddd0791bd44d30c7b3f8d47415a510'
+        // let sendRawTransaction = '90954cb64ef32525f7e78a12c8e6498dbfb625dc57cf8c01669f975eacb3ea18'
 
     // 8. Oracle broadcasts result
         console.log('Waiting 5 seconds before broadcasting oracle result...')
         await sleep(5000)
-        // let oracleBfp = 'bitcoinfile:74dedbba2b76718f4d9ab7ebde164870dc973e84e80a80dc75e7c8851f6f924b'
-        const oracleResultJson = '{"results":{"finalScore":{"awayTeam":112,"homeTeam":103}},"contracts":{"jeton-lib":{"e001":{"terms":[{"parties":["NBA-20200222-SAC-LAC_SAC-WIN","NBA-20200222-SAC-LAC_LAC-WIN"],"publicKey":"02c3e42dd2a3806f1bc9a9f32c3a97b872ed03ce8a779242b8bf2dba636ce655b0","signature":"304402202d435db55d497053e9b9fc7620985c99a8f7ff62d164446731473fddc1661baa02205f986222198947c0897aadc70982203a1ee6021a86aa9b0da57ca93e1a43fc8e"}]}}}}'
+        // let oracleBfp = 'bitcoinfile:b3f4023cabcf8a5437bc84e736e6a24c50a7c1bb12089a5a17d4e9fd04340812'
+        const oracleResultOb = {
+            type:"result",
+            data:{
+                finalScore:{
+                    awayTeam:112,
+                    homeTeam:103
+                }
+            },
+            contracts:{
+                jeton:{
+                    escrow:{
+                        message:"NBA-20200222-SAC-LAC_SAC-WIN",
+                        refereeSig:"304402202d435db55d497053e9b9fc7620985c99a8f7ff62d164446731473fddc1661baa02205f986222198947c0897aadc70982203a1ee6021a86aa9b0da57ca93e1a43fc8e"
+                    }
+                }
+            }
+        }
+        const oracleResultJson = JSON.stringify(oracleResultOb)
 
         // const someFileBuffer = new Buffer.from('aabbccddeeff', 'hex');
         const oracleResultFileBuffer = new Buffer.from(oracleResultJson);
@@ -663,11 +758,8 @@ function joinBuffers(buffers, delimiter = ' ') {
         };
         uploadCost = Bfp.calculateFileUploadCost(oracleResultFileSize, config);
         console.log('upload cost: ', uploadCost);
-        // process.exit()
 
         // create a funding transaction
-        // let fundingAddress = 'bitcoincash:qzess4sf437lrlp7rzt2afsjan2dh6uh3uht3fm498'
-        // let fundingWif = 'L3ZvsbDF3Rj48NqxWxyL8oufL4iRxiLxZHrSNgdQAiHYf8XzuXNe'
         let fundingAddress = oracleAddress
         let fundingWif = oracleWif
 
@@ -690,7 +782,20 @@ function joinBuffers(buffers, delimiter = ' ') {
         // wait for network to resolve...
 
         // upload the file
-        let oracleResultFileId = await bfp.uploadFile(oracleFundingUtxo, oracleAddress, oracleWif, oracleResultFileBuffer, config.fileName, config.fileExt);
+        let oracleResultFileId = await bfp.uploadFile(oracleFundingUtxo,
+            oracleAddress,
+            oracleWif,
+            oracleResultFileBuffer,
+            config.fileName,
+            config.fileExt,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            3000);
         console.log('Oracle result Id: ', oracleResultFileId);
         console.log('Original oracle Id: ', oracleFileId)
 
@@ -706,7 +811,7 @@ function joinBuffers(buffers, delimiter = ' ') {
         }
         console.log('Waiting 60 seconds before attempting to collect winnings...')
         await sleep(60000)
-        // let oracleBfp = 'bitcoinfile:a94a1ac4389736dce3ae0e8a87c3023fc20473e4fe8f8cab36dbceea71217971'
+        // let oracleBfp = 'bitcoinfile:b3f4023cabcf8a5437bc84e736e6a24c50a7c1bb12089a5a17d4e9fd04340812'
         // See if there are results
         oracleBfp = oracleFileId
 
@@ -748,15 +853,14 @@ function joinBuffers(buffers, delimiter = ' ') {
 
         let finalResultObj = JSON.parse(oracleFinalResult.toString('utf-8'))
 
-        let winner = finalResultObj.results.finalScore.awayTeam > finalResultObj.results.finalScore.homeTeam ? 'awayTeam' : 'homeTeam'
+        let winner = finalResultObj.data.finalScore.awayTeam > finalResultObj.data.finalScore.homeTeam ? 'awayTeam' : 'homeTeam'
         
-        console.log('The winner is the message at index 0:', oracleObj[winner].name)
+        console.log('The winner is the message at index 0:', oracleObj.data[winner].name)
         console.log('The winner is the accepting party, who can now spend')
 
         // TODO: Somehow get the metadata from the swap:payment made by the acceptor
         let p2shAddress = jeton.Address.fromScript(jeton.Script.fromString(paymentMetadata.p2shScriptPubKey))
         let p2shAddressString = p2shAddress.toString()
-        // let p2shAddressString = 'bitcoincash:pz2qmdp6a58x7lspqf6h5r72zqweapakxgcfgm6z8e'
 
         acceptUtxos = await network.getUtxos(p2shAddressString, false)
         // Hydrate for SLP
@@ -801,8 +905,8 @@ function joinBuffers(buffers, delimiter = ' ') {
         spendTx.to(acceptAddr, totalSats - byteCount)
 
         let acceptPrivKey = jeton.PrivateKey.fromWIF(acceptWif)
-        let winningMessage = finalResultObj.contracts['jeton-lib']['e001'].terms[0].parties[0]
-        let refereeSig = Signature.fromString(finalResultObj.contracts['jeton-lib']['e001'].terms[0].signature)
+        let winningMessage = finalResultObj.contracts[compilerId][compilerVersion].message
+        let refereeSig = Signature.fromString(finalResultObj.contracts[compilerId][compilerVersion].refereeSig)
         for (i = 0; i < acceptUtxos.length; i++) {
             spendTx.signEscrow(i, acceptPrivKey, winningMessage, refereeSig, jeton.Script.fromBuffer(subscriptBuf), sighash)
         }
