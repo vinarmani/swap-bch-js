@@ -2,7 +2,7 @@
 
 ## End-To-End Examples
 
-This directory contains end-to-end examples for Exchange (Type 1), Escrow (Type 2), and Threshold Crowdfunding (Type 3) collaborative transactions as described in the [Signal, Watch, and Pay (SWaP) Protocol Specification](https://github.com/vinarmani/swap-protocol/blob/master/swap-protocol-spec.md).
+This directory contains end-to-end examples for Exchange (Type 1), Escrow (Type 2), and Crowdfunding (Type 3) collaborative transactions as described in the [Signal, Watch, and Pay (SWaP) Protocol Specification](https://github.com/vinarmani/swap-protocol/blob/master/swap-protocol-spec.md).
 
 To install the necessary dependencies required to run the files, simply execute the following commands:
 
@@ -21,7 +21,7 @@ To install the necessary dependencies required to run the files, simply execute 
 `node e2e_exchange.js` for exchange<br>
 `node e2e_escrow.js` for escrow<br>
 `node e2e_threshold.js` for threshold escrow<br>
-`node e2e_cf.js` for threshold crowdfund<br>
+`node e2e_cf.js` for crowdfund<br>
 
 Note: These scripts all run on the mainnet of BCH.
 
