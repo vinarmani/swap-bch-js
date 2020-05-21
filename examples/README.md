@@ -20,6 +20,7 @@ To install the necessary dependencies required to run the files, simply execute 
 4. Run one of the example scripts, noting any instructions delivered in error messages<br>
 `node e2e_exchange.js` for exchange<br>
 `node e2e_escrow.js` for escrow<br>
+`node e2e_threshold.js` for threshold escrow<br>
 `node e2e_cf.js` for threshold crowdfund<br>
 
 Note: These scripts all run on the mainnet of BCH.
