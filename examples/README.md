@@ -4,6 +4,8 @@
 
 This directory contains end-to-end examples for Exchange (Type 1), Escrow (Type 2), and Crowdfunding (Type 3) collaborative transactions as described in the [Signal, Watch, and Pay (SWaP) Protocol Specification](https://github.com/vinarmani/swap-protocol/blob/master/swap-protocol-spec.md).
 
+Escrow (Type 2) examples simulate an on-chain oracle and use the [JSON Oracle Standard](https://github.com/vinarmani/swap-protocol/blob/master/json-oracle-standard.md).
+
 To install the necessary dependencies required to run the files, simply execute the following commands:
 
 #### For node.js
