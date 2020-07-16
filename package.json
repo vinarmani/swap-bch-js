@@ -1,6 +1,6 @@
 {
   "name": "swap-bch-js",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Signal, Watch and Pay (SWaP) Protocol on the Bitcoin Cash blockchain",
   "main": "index.js",
   "files": [
@@ -40,15 +40,16 @@
     "grpc-bchrpc-node": "^0.10.0",
     "grpc-bchrpc-web": "^0.5.0",
     "i": "^0.3.6",
-    "jeton-lib": "^1.6.3",
     "npm": "^6.13.7",
-    "slp-sdk": "^4.15.0",
     "varuint-bitcoin": "^1.1.2",
     "wif": "^2.0.6"
   },
   "devDependencies": {
+    "bitcoincashjs-lib": "github:Bitcoin-com/bitcoincashjs-lib#28447b40a4ccd23913f7ade6589dc7214c99e60a",
     "browserify": "^16.2.2",
+    "jeton-lib": "^1.6.3",
     "mocha": "^5.2.0",
+    "slp-sdk": "^4.15.0",
     "uglify-es": "^3.3.9",
     "bitbox-sdk": "^8.3.0"
   }
