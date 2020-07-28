@@ -35,22 +35,22 @@
   },
   "homepage": "https://github.com/vinarmani/swap-bch-js#readme",
   "dependencies": {
+    "@improbable-eng/grpc-web-react-native-transport": "^0.13.0",
     "buffer-reverse": "^1.0.1",
     "eccrypto-js": "^4.3.5",
-    "grpc-bchrpc-node": "^0.10.0",
-    "grpc-bchrpc-web": "^0.5.0",
+    "grpc-bchrpc-web": "^0.10.5",
     "i": "^0.3.6",
     "npm": "^6.13.7",
     "varuint-bitcoin": "^1.1.2",
     "wif": "^2.0.6"
   },
   "devDependencies": {
+    "bitbox-sdk": "^8.3.0",
     "bitcoincashjs-lib": "github:Bitcoin-com/bitcoincashjs-lib#28447b40a4ccd23913f7ade6589dc7214c99e60a",
     "browserify": "^16.2.2",
     "jeton-lib": "^1.6.3",
     "mocha": "^5.2.0",
     "slp-sdk": "^4.15.0",
-    "uglify-es": "^3.3.9",
-    "bitbox-sdk": "^8.3.0"
+    "uglify-es": "^3.3.9"
   }
 }
