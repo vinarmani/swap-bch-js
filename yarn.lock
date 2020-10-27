@@ -2926,10 +2926,10 @@ growl@1.10.5:
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
 
-grpc-bchrpc-web@^0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/grpc-bchrpc-web/-/grpc-bchrpc-web-0.10.5.tgz#18fb3c5938afb4ac6685c3e3f14bb3979615c24c"
-  integrity sha512-4uIA0H6xrnfqBojoGd2kUYZDaXnrVj771Uz9tmJBSdUWuKZdoNwF0kR4Q62WAN1gGpcQS8FyRHzXpzlxuEtEnQ==
+grpc-bchrpc-web@^0.11.4:
+  version "0.11.4"
+  resolved "https://registry.yarnpkg.com/grpc-bchrpc-web/-/grpc-bchrpc-web-0.11.4.tgz#dfda8d49a4d290cb1fda2eca9e76c0958423a087"
+  integrity sha512-uLYvBRrVT+nLcSVcQCZWlETp1pp7LFENU4Bg2K8f96n7ChYqPhFaA9YGExSg/2fN+T/y93OReaHODu+UMKvB2w==
   dependencies:
     "@improbable-eng/grpc-web" "^0.9.6"
     "@improbable-eng/grpc-web-node-http-transport" "^0.12.0"

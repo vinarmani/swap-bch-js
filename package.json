@@ -38,7 +38,7 @@
     "@improbable-eng/grpc-web-react-native-transport": "^0.13.0",
     "buffer-reverse": "^1.0.1",
     "eccrypto-js": "^4.3.5",
-    "grpc-bchrpc-web": "^0.10.5",
+    "grpc-bchrpc-web": "^0.11.4",
     "i": "^0.3.6",
     "npm": "^6.13.7",
     "varuint-bitcoin": "^1.1.2",
